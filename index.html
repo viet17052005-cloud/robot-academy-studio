@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Xưởng soạn bài STEM Robotics của Robot Academy. Gemini hỗ trợ giáo viên thiết kế hoạt động và xuất Word, PowerPoint.">
+  <title>Xưởng bài giảng | Robot Academy</title>
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="refresh.css">
+  <script defer src="vendor/docx.js"></script>
+  <script defer src="vendor/pptx.js"></script>
+  <script defer src="vendor/jszip.js"></script>
+  <script defer src="export.js"></script>
+  <script defer src="connection-errors.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <a class="brand" href="./"><img src="logo.png" alt="Robot Academy"><span>ROBOT ACADEMY<small>XƯỞNG BÀI GIẢNG</small></span></a>
+  <span class="nav-label">KHÔNG GIAN GIÁO VIÊN</span>
+  <nav>
+    <button class="nav-item active" data-view="create">✦ <span>Soạn bài mới</span></button>
+    <button class="nav-item" data-view="library">▤ <span>Thư viện của tôi</span></button>
+    <button class="nav-item" data-view="rules">◈ <span>Quy chuẩn học thuật</span></button>
+  </nav>
+  <div class="sidebar-note"><span class="tiny-star">✧</span><p>Mỗi bài học tốt<br>bắt đầu từ sự tò mò.</p><small>Quan sát · Thiết kế · Thử nghiệm</small></div>
+  <button class="connection" id="connect"><i id="dot"></i><span id="connection-label">Kết nối Gemini</span><b>↗</b></button>
+</aside>
+
+<main>
+  <header>
+    <span>Không gian sáng tạo <span class="slash">/</span> <b id="page-name">Soạn bài mới</b></span>
+    <div class="header-right"><span class="pill">STEM ROBOTICS · TIỂU HỌC</span><span class="avatar">GV</span></div>
+  </header>
+
+  <section id="create-view" class="view">
+    <div class="hero">
+      <div>
+        <span class="eyebrow">TỪ Ý TƯỞNG ĐẾN TIẾT HỌC</span>
+        <h1>Soạn bài nhẹ nhàng.<br><em>Khơi mở sáng tạo.</em></h1>
+        <p>Từ ý tưởng của thầy cô đến bộ bài dạy STEM Robotics hoàn chỉnh.<br class="desktop"> Thiết lập bài học, cùng AI soạn thảo và xuất học liệu ngay tại đây.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit one"></div><div class="orbit two"></div>
+        <span class="floating a">S</span><span class="floating b">T</span><span class="floating c">E</span><span class="floating d">M</span>
+        <div class="bot"><div class="antenna"></div><div class="face"><i></i><i></i><span>⌣</span></div></div>
+        <span class="spark">✧</span>
+      </div>
+    </div>
+
+    <div class="steps">
+      <span class="current"><b>01</b> Đặt nền tảng</span><i></i>
+      <span><b>02</b> Cùng AI soạn bài</span><i></i>
+      <span><b>03</b> Rà soát &amp; xuất file</span>
+    </div>
+
+    <div class="workspace">
+      <form id="lesson-form" class="panel">
+        <div class="panel-title">
+          <div><span class="eyebrow">THIẾT LẬP BÀI HỌC</span><h2>Bắt đầu từ ý tưởng của thầy cô</h2></div>
+          <button type="button" class="text-button" id="example">Thử bài mẫu ↗</button>
+        </div>
+
+        <label>Tên bài / chủ đề <span>*</span><input id="topic" required maxlength="120" placeholder="Ví dụ: Tàu hỏa siêu tốc" autocomplete="off"></label>
+
+        <div class="form-grid">
+          <label>Khối lớp<select id="grade">
+            <option value="1">Lớp 1</option><option value="2">Lớp 2</option>
+            <option value="3">Lớp 3</option><option value="4">Lớp 4</option><option value="5">Lớp 5</option>
+          </select></label>
+          <label>Số tiết theo KCT<select id="count">
+            <option value="4">4 tiết</option><option value="5" selected>5 tiết</option><option value="6">6 tiết</option>
+          </select></label>
+          <label>Chủ đề số<input type="number" id="topicNumber" min="1" max="99" value="2" required></label>
+        </div>
+
+        <label>Yêu cầu cần đạt <span>*</span>
+          <textarea id="outcomes" required maxlength="12000" rows="6" placeholder="Mỗi yêu cầu một dòng. Ví dụ:&#10;Nhận biết tàu hỏa là phương tiện giao thông đường sắt.&#10;Mô tả được các bộ phận chính.&#10;Lắp ráp và giới thiệu được mô hình tàu hỏa."></textarea>
+          <small>Dán nguyên văn YCCĐ từ khung chương trình để giữ đúng phạm vi bài học.</small>
+        </label>
+
+        <div class="form-grid two">
+          <label>Dạng bài<select id="type">
+            <option value="model">Lắp ráp mô hình</option>
+            <option value="control">Điều khiển / thi đấu</option>
+            <option value="code">Lắp ráp &amp; lập trình</option>
+            <option value="project">Dự án cuối khóa</option>
+          </select></label>
+          <label>Phạm vi soạn<select id="scope">
+            <option value="all">Toàn bộ chủ đề</option>
+            <option value="1">Chỉ tiết 1</option><option value="2">Chỉ tiết 2</option>
+            <option value="3">Chỉ tiết 3</option><option value="4">Chỉ tiết 4</option>
+            <option value="5">Chỉ tiết 5</option><option value="6">Chỉ tiết 6</option>
+          </select></label>
+        </div>
+
+        <details>
+          <summary>Học liệu, thiết bị &amp; điều chỉnh lớp học <span>+</span></summary>
+          <label>Bộ robot, phần mềm và lưu ý<textarea id="equipment" rows="3" maxlength="6000" placeholder="Tên bộ học liệu, phần mềm cụ thể, đặc điểm học sinh…"></textarea></label>
+          <label>Nguồn học liệu bổ sung<textarea id="context" rows="5" maxlength="24000" placeholder="Dán nội dung từ Notebook, sổ tay hoặc tài liệu của trường. Link đơn thuần không được tự động đọc."></textarea></label>
+          <a class="source-link" href="https://notebook.google.com" target="_blank" rel="noopener">Mở Google Notebook ↗</a>
+          <div class="form-grid two">
+            <label>Sĩ số<input id="students" type="number" min="8" max="60" value="35" required></label>
+            <label>Số học sinh / nhóm<input id="groupSize" type="number" min="2" max="6" value="5" required></label>
+          </div>
+        </details>
+
+        <div class="submit-area">
+          <p><b>35 phút / tiết</b> · Một cặp Word + PowerPoint riêng</p>
+          <button class="primary" type="submit" id="generate">✦ &nbsp; Thiết kế bài học với Gemini <span>→</span></button>
+          <small>Nội dung bạn nhập sẽ được gửi đến Google Gemini khi bấm tạo bài.</small>
+        </div>
+      </form>
+
+      <aside class="right-rail">
+        <div class="plan-card">
+          <span class="eyebrow">LỘ TRÌNH ĐỀ XUẤT</span>
+          <h3>Từng bước thành kỹ sư nhí</h3>
+          <div id="plan"></div>
+          <p class="note">Số tiết theo KCT. Hoạt động linh hoạt, mỗi tiết đủ 35 phút.</p>
+        </div>
+        <div class="deliverables">
+          <span class="eyebrow">BỘ HỌC LIỆU CỦA BẠN</span>
+          <div><b class="file-icon word">W</b><p>Kế hoạch bài dạy<small>Mục tiêu · Hoạt động GV–HS · Đánh giá</small></p></div>
+          <div><b class="file-icon ppt">P</b><p>Bài giảng điện tử<small>Slide trực quan · Câu hỏi · Đáp án</small></p></div>
+          <div class="brand-rule">✓ Logo Robot Academy &nbsp; ✓ Không watermark</div>
+        </div>
+        <div class="quote"><span>"</span>Không làm thay học sinh.<br>Hãy tạo cơ hội để các em tự tìm ra.<small>NGUYÊN TẮC THIẾT KẾ HOẠT ĐỘNG</small></div>
+      </aside>
+    </div>
+
+    <section id="results" hidden class="results panel">
+      <div class="panel-title">
+        <div><span class="eyebrow">02 / XƯỞNG BIÊN TẬP</span><h2 id="result-title">Bộ bài học của bạn</h2></div>
+        <button class="secondary" id="download-all">↓ Tải tất cả (.zip)</button>
+      </div>
+      <div id="progress" role="status" aria-live="polite"></div>
+      <button id="cancel" class="text-button" hidden>Dừng sau tiết đang soạn</button>
+      <div class="lesson-tabs" id="lesson-tabs"></div>
+      <div id="editor"></div>
+    </section>
+  </section>
+
+  <section id="library-view" class="view" hidden>
+    <span class="eyebrow">KHÔNG GIAN CỦA BẠN</span>
+    <h1>Thư viện bài học</h1>
+    <p class="muted">Bản nháp được lưu trên trình duyệt này. Khóa Gemini không được lưu.</p>
+    <div class="toolbar">
+      <button class="secondary" id="backup">↓ Sao lưu thư viện</button>
+      <label class="secondary file-button">↑ Khôi phục JSON<input id="restore" type="file" accept="application/json,.json"></label>
+    </div>
+    <div id="library-list"></div>
+  </section>
+
+  <section id="rules-view" class="view" hidden>
+    <span class="eyebrow">ROBOT ACADEMY</span>
+    <h1>Chất lượng bắt đầu<br>từ nguyên tắc.</h1>
+    <div class="rules-grid">
+      <article class="panel"><b>01</b><h2>Đúng nhịp học sinh</h2><p>Tiết 1 quan sát, khám phá, trả lời miệng. Không vẽ, chưa phát bộ lắp ráp. Tiết 2 mới phân vai và phác thảo Blueprint.</p></article>
+      <article class="panel"><b>02</b><h2>Học thông qua làm</h2><p>Bản thiết kế được duyệt trước khi lắp ráp. Có thử nghiệm, ghi nhận lỗi và cải tiến. Không viết hướng dẫn thiết bị khi chưa biết đúng loại.</p></article>
+      <article class="panel"><b>03</b><h2>Đánh giá có minh chứng</h2><p>Mỗi hoạt động có sản phẩm quan sát được, tiêu chí cụ thể, câu hỏi gợi mở và phương án hỗ trợ học sinh.</p></article>
+      <article class="panel"><b>04</b><h2>Giáo viên làm chủ</h2><p>AI cung cấp bản nháp để giáo viên rà soát. Word và slide dùng chung dữ liệu. Video cần được kiểm tra, bổ sung khung hình trước khi dạy.</p></article>
+    </div>
+    <p class="muted">Bộ quy tắc nội bộ Robot Academy. Các yêu cầu về logo, video, bảng GV–HS là SOP nội bộ; website không chứng nhận thẩm định pháp lý.</p>
+  </section>
+
+  <footer>ROBOT ACADEMY <span>Đồng hành cùng những nhà sáng tạo tương lai.</span><span>Gemini hỗ trợ · Giáo viên quyết định</span></footer>
+</main>
+
+<!-- Dialog kết nối Gemini -->
+<dialog id="key-dialog">
+  <form id="key-form">
+    <button type="button" class="close" id="close-key" aria-label="Đóng">×</button>
+    <span class="eyebrow">KẾT NỐI TRỢ LÝ HỌC THUẬT</span>
+    <h2>Đưa Gemini vào xưởng bài giảng</h2>
+    <p>Nhập API key của bạn. Khóa chỉ ở trong bộ nhớ của tab, được gửi trực tiếp đến Google qua HTTPS và mất khi tải lại trang.</p>
+    <p class="key-help">Dùng khóa Gemini của Google, không dùng khóa OpenAI/ChatGPT. <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Mở Google AI Studio ↗</a></p>
+    <label>Gemini API key<input type="password" id="api-key" placeholder="Dán khóa Gemini của bạn (bắt đầu bằng AIza…)" autocomplete="off" required></label>
+    <button class="primary" type="submit" id="check-key">Kết nối &amp; tải danh sách mô hình</button>
+    <label>Mô hình<select id="model"><option value="">Kết nối để chọn mô hình</option></select></label>
+    <p id="key-status" role="status"></p>
+    <small>Chi phí và hạn mức phụ thuộc tài khoản Google AI của bạn. Không dùng khóa chung của tổ chức trên máy công cộng.</small>
+    <button type="button" class="text-button" id="forget">Ngắt kết nối và xóa khóa khỏi tab</button>
+  </form>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
